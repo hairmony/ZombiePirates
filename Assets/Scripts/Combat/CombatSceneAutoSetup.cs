@@ -93,12 +93,12 @@ public class CombatSceneAutoSetup : MonoBehaviour
         controller.noteSpeed = 3.2f;
         controller.missLineY = -3.95f;
         controller.explorationSceneName = "SampleScene";
-        controller.runtimeSprite = runtimeSprite;
-        controller.notesParent = notesParent;
-        controller.playerShip = playerShip.root;
-        controller.enemyShip = enemyShip.root;
-        controller.playerMuzzleFlash = playerShip.muzzleFlash;
-        controller.enemyDamageFlash = enemyShip.damageFlash;
+        //controller.runtimeSprite = runtimeSprite;
+        //controller.notesParent = notesParent;
+        //controller.playerShip = playerShip.root;
+        //controller.enemyShip = enemyShip.root;
+        //controller.playerMuzzleFlash = playerShip.muzzleFlash;
+        //controller.enemyDamageFlash = enemyShip.damageFlash;
 
         BuildUI(controller);
     }
