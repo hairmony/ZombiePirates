@@ -153,7 +153,8 @@ void HandleInputs()
         {
             wrongPresses++;
             ShowFeedback("MISS!", new Color(1f, 0.45f, 0.45f));
-            ShakeShip(playerShip, playerShipBasePos, 0.06f, 0.08f);
+            ApplyInputMiss();
+            //ShakeShip(playerShip, playerShipBasePos, 0.06f, 0.08f);
             RefreshProgress();
             continue;
         }
@@ -175,7 +176,7 @@ void HandleInputs()
         {
             wrongPresses++;
             ShowFeedback("MISS!", new Color(1f, 0.45f, 0.45f));
-            ShakeShip(playerShip, playerShipBasePos, 0.06f, 0.08f);
+            //ShakeShip(playerShip, playerShipBasePos, 0.06f, 0.08f);
             RefreshProgress();
         }
     }
@@ -253,6 +254,13 @@ void RunSpawner()
         EndCombat();
     }
 
+    void ApplyInputMiss()
+    {
+        missNotes++;
+        judgedNotes++;
+        ShowFeedback("MISS!", new Color(1f, 0.45f, 0.45f));
+        RefreshProgress();
+    }
     void EndCombat()
     {
         combatEnded = true;
@@ -270,21 +278,26 @@ void RunSpawner()
 
         //if (restartButton != null) restartButton.gameObject.SetActive(true);
         //if (returnButton != null) returnButton.gameObject.SetActive(true);
+        StartCoroutine(EndLevel());
+    }
 
+    IEnumerator EndLevel()
+    {
+        yield return new WaitForSeconds(4f);
         SceneManager.LoadScene(returnScene);
     }
 
     public void RegisterHit(RhythmNote note)
     {
-        /*hitNotes++;
+        hitNotes++;
         judgedNotes++;
         RefreshProgress();
 
-        FlashSprite(playerMuzzleFlash, new Color(1f, 0.88f, 0.35f, 1f), 0.14f);
-        FlashSprite(enemyDamageFlash, new Color(1f, 0.5f, 0.22f, 0.9f), 0.16f);
+        //FlashSprite(playerMuzzleFlash, new Color(1f, 0.88f, 0.35f, 1f), 0.14f);
+        //FlashSprite(enemyDamageFlash, new Color(1f, 0.5f, 0.22f, 0.9f), 0.16f);
 
-        ShakeShip(playerShip, playerShipBasePos, 0.1f, 0.12f);
-        ShakeShip(enemyShip, enemyShipBasePos, 0.14f, 0.15f);*/
+        //ShakeShip(playerShip, playerShipBasePos, 0.1f, 0.12f);
+        //ShakeShip(enemyShip, enemyShipBasePos, 0.14f, 0.15f);
     }
 
     public void RegisterMiss(RhythmNote note)
