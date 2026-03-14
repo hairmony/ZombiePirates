@@ -54,6 +54,9 @@ public class RhythmFightController : MonoBehaviour
 
     public bool InputEnabled => countdownFinished && !combatEnded;
 
+    [Header("Return Scene")]
+    private string returnScene = "Ocean";
+
     void Start()
     {
         if (playerShip != null) playerShipBasePos = playerShip.position;
@@ -265,8 +268,10 @@ void RunSpawner()
         if (feedbackText != null)
             feedbackText.text = won ? "Sea route secured." : "Retreat and regroup.";
 
-        if (restartButton != null) restartButton.gameObject.SetActive(true);
-        if (returnButton != null) returnButton.gameObject.SetActive(true);
+        //if (restartButton != null) restartButton.gameObject.SetActive(true);
+        //if (returnButton != null) returnButton.gameObject.SetActive(true);
+
+        SceneManager.LoadScene(returnScene);
     }
 
     public void RegisterHit(RhythmNote note)
