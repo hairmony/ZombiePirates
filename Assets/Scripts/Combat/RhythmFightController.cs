@@ -42,6 +42,9 @@ public class RhythmFightController : MonoBehaviour
 
     private Coroutine feedbackRoutine;
 
+    [Header("Return Scene")]
+    private string returnScene = "Ocean";
+
     public bool InputEnabled => countdownFinished && !combatEnded;
 
     void Start()
@@ -321,5 +324,10 @@ public class RhythmFightController : MonoBehaviour
     public void ReturnToExploration()
     {
         SceneManager.LoadScene(explorationSceneName);
+    }
+
+    public void GoToScene()
+    {
+        SceneManager.LoadScene(returnScene);
     }
 }
