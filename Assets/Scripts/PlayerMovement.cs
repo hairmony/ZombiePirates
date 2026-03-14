@@ -12,14 +12,20 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float moveForce = 6f;
 
+    [Tooltip("How quickly the ship accelerates to full speed. Lower = sluggish, Higher = snappy.")]
+    public float acceleration = 5f;
+
+    [Tooltip("How quickly the ship slows down when no input. Lower = longer ocean drift.")]
+    public float deceleration = 1.5f;
+
     public float moveX;
     public float moveY;
     public bool isGrounded = true;
     public bool canMove = true;
-    private Vector2 lastMoveDirection = Vector2.right; // Default to right
+    private Vector2 lastMoveDirection = Vector2.right;
 
     [Header("Relative Movement")]
-    [SerializeField] private float rotationSpeed = 10f; // Degrees per second
+    [SerializeField] private float rotationSpeed = 10f;
 
     [Header("Time Slow")]
     public bool canTimeSlow = false;
@@ -37,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
     public float rollCooldown = 0.5f;
     public bool isRolling = false;
     public float rollCooldownTimer = 0.4f;
-    private CapsuleCollider2D collider;
+    private new CapsuleCollider2D collider; // 'new' suppresses CS0108 warning
     private Vector2 normalColliderSize;
     private Vector2 normalColliderOffset;
     public Vector2 rollColliderSize = new Vector2(0f, 0f);
@@ -57,26 +63,18 @@ public class PlayerMovement : MonoBehaviour
         myBody.freezeRotation = true;
     }
 
-    void Start()
-    {
-
-    }
+    void Start() { }
 
     void Update()
     {
         if (canMove && !isRolling)
             PlayerMoveKeyboard();
 
-        //if (moveX != 0 && !isRolling) 
-        //    sr.flipX = moveX < 0;
-
         ApplyRotation();
 
         // TIME SLOW
         if (canTimeSlow && !isSlowing && controls.fire3Pressed)
-        {
             StartTimeSlow();
-        }
 
         if (isSlowing)
         {
@@ -85,15 +83,10 @@ public class PlayerMovement : MonoBehaviour
                 EndTimeSlow();
         }
 
-        //myBody.gravityScale = isSlowing ? normalGravity * slowFactorPlayer : normalGravity;
-
-        //ROLL
+        // ROLL
         if (canRoll && !isRolling && rollCooldownTimer <= 0f && controls.rollPressed && canMove)
-        {
             StartRoll();
-        }
 
-        // Update roll timer
         if (isRolling)
         {
             rollTimer -= Time.unscaledDeltaTime;
@@ -108,9 +101,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         if (isRolling)
-        {
             myBody.linearVelocity = rollDirection * rollForce;
-        }
     }
 
     void PlayerMoveKeyboard()
@@ -122,49 +113,39 @@ public class PlayerMovement : MonoBehaviour
         Vector2 moveDirection = new Vector2(moveX, moveY).normalized;
 
         if (moveDirection != Vector2.zero)
-        {
             lastMoveDirection = moveDirection;
-        }
 
-        float velocity = moveForce;
-
+        float topSpeed = moveForce;
         if (isSlowing)
-            velocity *= slowFactorPlayer;
-        myBody.linearVelocity = moveDirection * velocity;
+            topSpeed *= slowFactorPlayer;
+
+        if (moveDirection != Vector2.zero)
+        {
+            // Accelerate toward the target velocity — feels like pushing through water
+            Vector2 targetVelocity = moveDirection * topSpeed;
+            myBody.linearVelocity = Vector2.Lerp(
+                myBody.linearVelocity,
+                targetVelocity,
+                acceleration * Time.deltaTime
+            );
+        }
+        else
+        {
+            // No input — coast to a stop slowly (ocean drift)
+            myBody.linearVelocity = Vector2.Lerp(
+                myBody.linearVelocity,
+                Vector2.zero,
+                deceleration * Time.deltaTime
+            );
+        }
     }
-
-    //void PlayerMoveKeyboard()
-    //{
-    //    if (isRolling) return;
-
-    //    // 1. Get Inputs
-    //    moveX = controls.horizontalInput; // A/D keys
-    //    moveY = Input.GetAxisRaw("Vertical"); // W/S keys
-
-    //    // 2. Handle Rotation (A/D)
-    //    // We subtract moveX because positive D usually means clockwise rotation
-    //    float rotationAmount = -moveX * rotationSpeed * Time.unscaledDeltaTime;
-    //    transform.Rotate(0, 0, rotationAmount);
-
-    //    // 3. Handle Forward/Backward Movement (W/S)
-    //    // Most Unity sprites face 'Right' by default. If yours faces 'Up', use transform.up
-    //    Vector2 forwardDirection = transform.right;
-
-    //    float velocity = moveForce;
-    //    if (isSlowing) velocity *= slowFactorPlayer;
-
-    //    // Move along the sprite's current facing direction
-    //    myBody.linearVelocity = forwardDirection * (moveY * velocity);
-    //}
 
     void ApplyRotation()
     {
         if (moveX != 0 || moveY != 0)
         {
-            // Subtract 90° to account for sprite facing UP instead of RIGHT
             float targetAngle = Mathf.Atan2(moveY, moveX) * Mathf.Rad2Deg - 90f;
             float currentAngle = transform.eulerAngles.z;
-
             float smoothAngle = Mathf.LerpAngle(currentAngle, targetAngle, rotationSpeed * Time.unscaledDeltaTime);
             transform.rotation = Quaternion.Euler(0, 0, smoothAngle);
         }
@@ -174,9 +155,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isSlowing = true;
         slowTimer = slowDuration;
-        moveForce /= (slowFactorPlayer);
-        //myBody.gravityScale /= (slowFactorPlayer);
-
+        moveForce /= slowFactorPlayer;
         Time.timeScale = slowFactor;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
     }
@@ -184,12 +163,9 @@ public class PlayerMovement : MonoBehaviour
     void EndTimeSlow()
     {
         isSlowing = false;
-        moveForce *= (slowFactorPlayer);
-
+        moveForce *= slowFactorPlayer;
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
-
-        //myBody.gravityScale = normalGravity;
     }
 
     void StartRoll()
@@ -202,64 +178,20 @@ public class PlayerMovement : MonoBehaviour
         float v = Input.GetAxisRaw("Vertical");
         rollDirection = new Vector2(h, v).normalized;
 
-        // Rolling while not moving
         if (rollDirection == Vector2.zero)
-        {
             rollDirection = lastMoveDirection;
-        }
 
         collider.size = rollColliderSize;
         collider.offset = rollColliderOffset;
         canMove = false;
     }
 
-    //void StartRoll()
-    //{
-    //    isRolling = true;
-    //    rollTimer = rollDuration;
-    //    rollCooldownTimer = rollCooldown;
-
-    //    // Get the current vertical input to see if rolling forward or backward
-    //    float v = Input.GetAxisRaw("Vertical");
-
-    //    // Determine roll direction based on sprite's facing
-    //    // Again, use transform.up if your sprite's 'front' is the top
-    //    Vector2 facingDir = transform.right;
-
-    //    // Roll backward if holding S, otherwise roll forward
-    //    rollDirection = (v < 0) ? -facingDir : facingDir;
-
-    //    collider.size = rollColliderSize;
-    //    collider.offset = rollColliderOffset;
-    //    canMove = false;
-    //}
-
     void EndRoll()
     {
         isRolling = false;
         canMove = true;
-
         collider.size = normalColliderSize;
         collider.offset = normalColliderOffset;
-
-        //myBody.linearVelocity = new Vector2(0f, myBody.linearVelocity.y);
         myBody.linearVelocity = Vector2.zero;
     }
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Ground"))
-    //    {
-    //        isGrounded = true;
-    //        jumpsLeft = canDoubleJump ? extraJumps : 0;
-    //    }
-    //}
-
-    //private void OnCollisionExit2D(Collision2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Ground"))
-    //    {
-    //        isGrounded = false;
-    //    }
-    //}
 }

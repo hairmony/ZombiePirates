@@ -381,6 +381,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveForce: 24
+  acceleration: 2
+  deceleration: 1.5
   moveX: 0
   moveY: 0
   isGrounded: 1
