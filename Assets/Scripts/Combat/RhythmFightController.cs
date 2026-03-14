@@ -271,7 +271,7 @@ void RunSpawner()
 
     public void RegisterHit(RhythmNote note)
     {
-        hitNotes++;
+        /*hitNotes++;
         judgedNotes++;
         RefreshProgress();
 
@@ -279,7 +279,7 @@ void RunSpawner()
         FlashSprite(enemyDamageFlash, new Color(1f, 0.5f, 0.22f, 0.9f), 0.16f);
 
         ShakeShip(playerShip, playerShipBasePos, 0.1f, 0.12f);
-        ShakeShip(enemyShip, enemyShipBasePos, 0.14f, 0.15f);
+        ShakeShip(enemyShip, enemyShipBasePos, 0.14f, 0.15f);*/
     }
 
     public void RegisterMiss(RhythmNote note)
@@ -288,7 +288,7 @@ void RunSpawner()
         judgedNotes++;
         RefreshProgress();
         ShowFeedback("MISS!", new Color(1f, 0.45f, 0.45f));
-        ShakeShip(playerShip, playerShipBasePos, 0.05f, 0.08f);
+        //ShakeShip(playerShip, playerShipBasePos, 0.05f, 0.08f);
     }
 
     int GetAccuracyPercent()

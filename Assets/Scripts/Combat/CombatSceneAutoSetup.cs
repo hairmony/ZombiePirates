@@ -33,7 +33,7 @@ public class CombatSceneAutoSetup : MonoBehaviour
 
     void BuildScene()
     {
-        BuildBackground();
+        //BuildBackground();
 
         Transform notesParent = new GameObject("Notes").transform;
         float[] xs = new float[] { -4.5f, -1.5f, 1.5f, 4.5f };
@@ -81,8 +81,8 @@ public class CombatSceneAutoSetup : MonoBehaviour
     spawnPoints[i] = spawn.transform;
 }
 
-        ShipParts playerShip = BuildShip(new Vector3(-6.25f, -2.15f, 0f), true, "PlayerShip");
-        ShipParts enemyShip = BuildShip(new Vector3(6.25f, 2.2f, 0f), false, "EnemyShip");
+        //ShipParts playerShip = BuildShip(new Vector3(-6.25f, -2.15f, 0f), true, "PlayerShip");
+        //ShipParts enemyShip = BuildShip(new Vector3(6.25f, 2.2f, 0f), false, "EnemyShip");
 
         GameObject controllerGO = new GameObject("RhythmFightController");
         RhythmFightController controller = controllerGO.AddComponent<RhythmFightController>();
@@ -95,10 +95,10 @@ public class CombatSceneAutoSetup : MonoBehaviour
         controller.explorationSceneName = "SampleScene";
         controller.runtimeSprite = runtimeSprite;
         controller.notesParent = notesParent;
-        controller.playerShip = playerShip.root;
-        controller.enemyShip = enemyShip.root;
-        controller.playerMuzzleFlash = playerShip.muzzleFlash;
-        controller.enemyDamageFlash = enemyShip.damageFlash;
+        //controller.playerShip = playerShip.root;
+        //controller.enemyShip = enemyShip.root;
+        //controller.playerMuzzleFlash = playerShip.muzzleFlash;
+        //controller.enemyDamageFlash = enemyShip.damageFlash;
 
         BuildUI(controller);
     }
